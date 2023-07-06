@@ -9,6 +9,7 @@ import { Button } from '../components/ui/Button';
 import logoImg from '../../public/logo.svg';
 import Link from 'next/link';
 import { AuthContext } from '../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 export default function Home() {
     const [email, setEmail] = useState('');
@@ -20,12 +21,17 @@ export default function Home() {
     async function handleLogin(event: FormEvent) {
         event.preventDefault();
 
+        if (email === '' || password === ''){
+            toast.warning("Preencha todos os campos!");
+            return;
+        }
+        setLoading(true);
         let data = {
             email,
             password
         }
-
         await signIn(data);
+        setLoading(false);
     }
 
     return (
@@ -34,7 +40,7 @@ export default function Home() {
                 <title>SujeitoPizza - Faça o seu login</title>
             </Head>
             <div className={styles.containerCenter}>
-                <Image src={logoImg} alt="Logo Sujeito Pizzaria" />
+                <Image src={logoImg} alt="Logo Sujeito Pizzaria" priority={false}/>
 
                 <div className={styles.login}>
                     <form onSubmit={handleLogin}>
@@ -55,7 +61,6 @@ export default function Home() {
                         <Button
                             type="submit"
                             loading={loading}
-                            onClick={() => setLoading(true)}
                         >
                             Acessar
                         </Button>
