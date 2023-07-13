@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { AuthContext } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
 
+import { canSSRGuest } from '../utils/canSSRGuest';
+
 export default function Home() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -21,7 +23,7 @@ export default function Home() {
     async function handleLogin(event: FormEvent) {
         event.preventDefault();
 
-        if (email === '' || password === ''){
+        if (email === '' || password === '') {
             toast.warning("Preencha todos os campos!");
             return;
         }
@@ -40,7 +42,7 @@ export default function Home() {
                 <title>SujeitoPizza - Faça o seu login</title>
             </Head>
             <div className={styles.containerCenter}>
-                <Image src={logoImg} alt="Logo Sujeito Pizzaria" priority={false}/>
+                <Image src={logoImg} alt="Logo Sujeito Pizzaria" priority={false} />
 
                 <div className={styles.login}>
                     <form onSubmit={handleLogin}>
@@ -73,3 +75,11 @@ export default function Home() {
         </>
     )
 }
+
+
+export const getServerSideProps = canSSRGuest(async (ctx) => {
+
+    return {
+        props: {}
+    }
+}) 

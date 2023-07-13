@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useState, useEffect } from 'react';
 
 import { api } from '../services/apiClient';
 
@@ -51,6 +51,28 @@ export function AuthProvider({ children }: AuthProvideProps) {
     const [user, setUser] = useState<UserProps>();
     const isAuthenticated = !!user;
 
+    useEffect(() => {
+        //tentar pegar dados através do cookie
+        const { '@nextauth.token': token } = parseCookies();
+
+        if (token) {
+            //acessa a rota /me
+            api.get('/me').then((response) => {
+                const { id, name, email } = response.data;
+
+                setUser({
+                    id,
+                    name,
+                    email
+                });
+            }) .catch(() => {
+                // Se der erro deslogamos o usuário
+                signOut();
+            })
+        }
+
+    }, [])
+
 
     async function signIn({ email, password }: SignInProps) {
         try {
@@ -99,7 +121,7 @@ export function AuthProvider({ children }: AuthProvideProps) {
             toast.error("Erro ao cadastrar o usuário!");
             // console.log("Erro ao cadastrar - ", error)
         }
-        
+
     }
 
     return (
